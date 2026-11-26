@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../controllers/lyrics_controller.dart';
 import '../models/lyric_line.dart';
 import '../theme/lyrics_presets.dart';
@@ -7,10 +7,11 @@ import 'instrumental_indicator.dart';
 import 'syllable_line_view.dart';
 
 /// Flagship full-featured synchronized lyrics viewport with Apple Music / Spotify styling,
-/// syllable gradient wipes, intelligent auto-scrolling, and interactive seek controls.
+/// syllable and character gradient wipes, intelligent auto-scrolling, and interactive seek controls.
 class LyricsView extends StatefulWidget {
   final LyricsController controller;
   final LyricsTheme? theme;
+  final LyricFlowMode? flowMode;
   final bool showTranslation;
   final bool showRomanization;
   final Widget? header;
@@ -22,6 +23,7 @@ class LyricsView extends StatefulWidget {
     super.key,
     required this.controller,
     this.theme,
+    this.flowMode,
     this.showTranslation = true,
     this.showRomanization = true,
     this.header,
@@ -142,7 +144,14 @@ class _LyricsViewState extends State<LyricsView> {
 
   @override
   Widget build(BuildContext context) {
-    final activeTheme = widget.theme ?? LyricsPreset.appleMusic();
+    var activeTheme = widget.theme ?? LyricsPreset.appleMusic();
+    if (widget.flowMode != null) {
+      activeTheme = activeTheme.copyWith(
+        karaokeStyle: activeTheme.karaokeStyle.copyWith(
+          flowMode: widget.flowMode,
+        ),
+      );
+    }
 
     return ValueListenableBuilder<LyricsState>(
       valueListenable: widget.controller,
@@ -156,7 +165,7 @@ class _LyricsViewState extends State<LyricsView> {
           return const Center(
             child: Text(
               'No lyrics available',
-              style: TextStyle(color: Colors.white54, fontSize: 16),
+              style: TextStyle(color: Color(0x8AFFFFFF), fontSize: 16),
             ),
           );
         }
@@ -235,12 +244,12 @@ class _LyricsViewState extends State<LyricsView> {
                         : const Offset(0, 1),
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeOutCubic,
-                    child: InkWell(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         widget.controller.resumeAutoScroll();
                         _scrollToLine(state.lineIndex);
                       },
-                      borderRadius: BorderRadius.circular(24),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 18,
@@ -248,33 +257,33 @@ class _LyricsViewState extends State<LyricsView> {
                         ),
                         decoration: BoxDecoration(
                           color:
-                              const Color(0xFF1E1E24).withValues(alpha: 0.92),
+                              const Color(0xFF1E1E24).withValues(alpha: 0.94),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color:
+                                const Color(0xFFFFFFFF).withValues(alpha: 0.2),
                             width: 1,
                           ),
                           boxShadow: const [
                             BoxShadow(
-                              color: Colors.black45,
+                              color: Color(0x66000000),
                               blurRadius: 16,
                               offset: Offset(0, 6),
                             ),
                           ],
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.arrow_downward_rounded,
-                              color: Colors.white,
-                              size: 16,
+                            CustomPaint(
+                              size: const Size(12, 12),
+                              painter: _DownChevronPainter(),
                             ),
-                            SizedBox(width: 8),
-                            Text(
+                            const SizedBox(width: 8),
+                            const Text(
                               'Return to current line',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Color(0xFFFFFFFF),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.2,
@@ -292,4 +301,25 @@ class _LyricsViewState extends State<LyricsView> {
       },
     );
   }
+}
+
+class _DownChevronPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFFFFFFF)
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    final path = Path()
+      ..moveTo(0, size.height * 0.3)
+      ..lineTo(size.width * 0.5, size.height * 0.8)
+      ..lineTo(size.width, size.height * 0.3);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_DownChevronPainter oldDelegate) => false;
 }

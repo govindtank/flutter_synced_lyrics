@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'lyrics_theme.dart';
 
 /// Ready-to-use trending visual style presets for [LyricsView].
 class LyricsPreset {
   const LyricsPreset._();
+
+  static const Color _white = Color(0xFFFFFFFF);
 
   /// Apple Music style:
   /// - Syllable-by-syllable smooth gradient wipe
@@ -11,12 +13,13 @@ class LyricsPreset {
   /// - Inactive lines dimmed to 35% opacity and frosted with a 1.2px gaussian blur
   /// - Left-aligned with comfortable vertical rhythm
   static LyricsTheme appleMusic({
-    Color activeColor = Colors.white,
+    Color activeColor = _white,
     Color inactiveColor = const Color(0x59FFFFFF),
-    Color highlightColor = Colors.white,
+    Color highlightColor = _white,
     double activeScale = 1.10,
     bool blurInactive = true,
     double baseFontSize = 26.0,
+    LyricFlowMode flowMode = LyricFlowMode.word,
   }) {
     return LyricsTheme(
       lineSpacing: 18.0,
@@ -78,12 +81,13 @@ class LyricsPreset {
         activeColor: highlightColor,
         inactiveColor: inactiveColor,
         activeGradient: const LinearGradient(
-          colors: [Colors.white, Color(0xFFF0F0FF)],
+          colors: [_white, Color(0xFFF0F0FF)],
         ),
         enableGlow: false,
+        flowMode: flowMode,
       ),
       instrumentalStyle: const InstrumentalBreakStyle(
-        accentColor: Colors.white,
+        accentColor: _white,
         dotSize: 6.0,
         dotCount: 3,
         showCountdown: true,
@@ -96,10 +100,11 @@ class LyricsPreset {
   /// - Active line snaps cleanly to center
   /// - Inactive lines dimmed to 30% opacity without heavy blur
   static LyricsTheme spotify({
-    Color activeColor = Colors.white,
+    Color activeColor = _white,
     Color inactiveColor = const Color(0x4DFFFFFF),
     TextAlign textAlign = TextAlign.left,
     double baseFontSize = 24.0,
+    LyricFlowMode flowMode = LyricFlowMode.word,
   }) {
     return LyricsTheme(
       lineSpacing: 14.0,
@@ -146,11 +151,101 @@ class LyricsPreset {
       karaokeStyle: KaraokeHighlightStyle(
         activeColor: activeColor,
         inactiveColor: inactiveColor,
+        flowMode: flowMode,
       ),
       instrumentalStyle: const InstrumentalBreakStyle(
         accentColor: Color(0xFF1ED760),
         dotSize: 6.0,
         dotCount: 3,
+        showCountdown: true,
+      ),
+    );
+  }
+
+  /// Bollywood Royal style:
+  /// - Rich saffron and warm amber gold highlights with Devanagari typography
+  /// - Subtly blurred inactive lines with royal gold bloom
+  /// - Character-by-character fluid flowing (ideal for Hindi & Devanagari songs)
+  static LyricsTheme bollywoodRoyal({
+    Color gold = const Color(0xFFFFD700),
+    Color saffron = const Color(0xFFFF9933),
+    Color inactiveColor = const Color(0x4DFFFFFF),
+    double baseFontSize = 26.0,
+    LyricFlowMode flowMode = LyricFlowMode.characterSmooth,
+  }) {
+    return LyricsTheme(
+      lineSpacing: 18.0,
+      activeLineStyle: LyricLineStyle(
+        textStyle: TextStyle(
+          color: gold,
+          fontSize: baseFontSize,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.3,
+          shadows: [
+            Shadow(
+              color: gold.withValues(alpha: 0.65),
+              blurRadius: 14,
+            ),
+          ],
+          height: 1.35,
+        ),
+        translationStyle: TextStyle(
+          color: saffron,
+          fontSize: baseFontSize * 0.68,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+          height: 1.4,
+        ),
+        romanizationStyle: TextStyle(
+          color: _white.withValues(alpha: 0.85),
+          fontSize: baseFontSize * 0.58,
+          fontStyle: FontStyle.italic,
+          letterSpacing: 0.3,
+          height: 1.3,
+        ),
+        scale: 1.10,
+        opacity: 1.0,
+        blurSigma: 0.0,
+        textAlign: TextAlign.center,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+      ),
+      inactiveLineStyle: LyricLineStyle(
+        textStyle: TextStyle(
+          color: inactiveColor,
+          fontSize: baseFontSize,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.2,
+          height: 1.35,
+        ),
+        translationStyle: TextStyle(
+          color: saffron.withValues(alpha: 0.4),
+          fontSize: baseFontSize * 0.68,
+          height: 1.4,
+        ),
+        romanizationStyle: TextStyle(
+          color: inactiveColor.withValues(alpha: 0.4),
+          fontSize: baseFontSize * 0.58,
+          fontStyle: FontStyle.italic,
+          height: 1.3,
+        ),
+        scale: 1.0,
+        opacity: 0.36,
+        blurSigma: 1.0,
+        textAlign: TextAlign.center,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+      ),
+      karaokeStyle: KaraokeHighlightStyle(
+        activeColor: gold,
+        inactiveColor: inactiveColor,
+        enableGlow: true,
+        glowColor: gold.withValues(alpha: 0.75),
+        glowRadius: 12.0,
+        flowMode: flowMode,
+      ),
+      instrumentalStyle: const InstrumentalBreakStyle(
+        accentColor: Color(0xFFFF9933),
+        dotSize: 7.0,
+        dotCount: 4,
         showCountdown: true,
       ),
     );
@@ -163,6 +258,7 @@ class LyricsPreset {
     Color neonColor = const Color(0xFFFFE600),
     Color inactiveColor = const Color(0x4DFFFFFF),
     double baseFontSize = 26.0,
+    LyricFlowMode flowMode = LyricFlowMode.word,
   }) {
     return LyricsTheme(
       lineSpacing: 16.0,
@@ -204,6 +300,7 @@ class LyricsPreset {
         enableGlow: true,
         glowColor: neonColor.withValues(alpha: 0.7),
         glowRadius: 14.0,
+        flowMode: flowMode,
       ),
       instrumentalStyle: InstrumentalBreakStyle(
         accentColor: neonColor,
@@ -222,6 +319,7 @@ class LyricsPreset {
     Color magenta = const Color(0xFFFF0055),
     Color inactive = const Color(0xFF0D404A),
     double baseFontSize = 22.0,
+    LyricFlowMode flowMode = LyricFlowMode.characterSmooth,
   }) {
     return LyricsTheme(
       lineSpacing: 14.0,
@@ -275,6 +373,7 @@ class LyricsPreset {
         enableGlow: true,
         glowColor: cyan.withValues(alpha: 0.9),
         glowRadius: 12.0,
+        flowMode: flowMode,
       ),
       instrumentalStyle: InstrumentalBreakStyle(
         accentColor: magenta,
@@ -292,6 +391,7 @@ class LyricsPreset {
     Color textColor = const Color(0xFFF5F5F7),
     Color dimmedColor = const Color(0x59F5F5F7),
     double baseFontSize = 24.0,
+    LyricFlowMode flowMode = LyricFlowMode.word,
   }) {
     return LyricsTheme(
       lineSpacing: 20.0,
@@ -327,6 +427,7 @@ class LyricsPreset {
       karaokeStyle: KaraokeHighlightStyle(
         activeColor: textColor,
         inactiveColor: dimmedColor,
+        flowMode: flowMode,
       ),
       instrumentalStyle: InstrumentalBreakStyle(
         accentColor: textColor.withValues(alpha: 0.7),

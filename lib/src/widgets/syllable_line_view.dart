@@ -1,10 +1,10 @@
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../models/lyric_line.dart';
 import '../models/lyric_syllable.dart';
 import '../theme/lyrics_theme.dart';
 
-/// Renders a single lyric line with syllable-by-syllable smooth progress wiping,
+/// Renders a single lyric line with syllable-level or character-level progress wiping,
 /// optional translation/romanization subtitles, and tap-to-seek interaction.
 class SyllableLineView extends StatelessWidget {
   final LyricLine line;
@@ -32,8 +32,12 @@ class SyllableLineView extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget content;
 
-    if (isActive && line.hasSyllables) {
-      content = _buildSyllableRow();
+    if (isActive) {
+      if (line.hasSyllables) {
+        content = _buildSyllableRow();
+      } else {
+        content = _buildActiveFlowingLine();
+      }
     } else {
       content = _buildStandardLine();
     }
@@ -119,6 +123,67 @@ class SyllableLineView extends StatelessWidget {
       line.text,
       style: lineStyle.textStyle,
       textAlign: lineStyle.textAlign,
+    );
+  }
+
+  /// Renders lines without explicit syllable tags using character-wise or word-wise wipe
+  Widget _buildActiveFlowingLine() {
+    final progress = line.getProgress(currentPosition);
+
+    final unhighlightedStyle = lineStyle.textStyle.copyWith(
+      color: karaokeStyle.inactiveColor,
+    );
+
+    final highlightedStyle = lineStyle.textStyle.copyWith(
+      color: karaokeStyle.activeColor,
+      shadows: karaokeStyle.enableGlow
+          ? [
+              Shadow(
+                color: karaokeStyle.glowColor,
+                blurRadius: karaokeStyle.glowRadius,
+              ),
+            ]
+          : lineStyle.textStyle.shadows,
+    );
+
+    // 1. Stepped character reveal
+    if (karaokeStyle.flowMode == LyricFlowMode.characterStepped) {
+      final chars = line.text.characters;
+      final totalChars = chars.length;
+      final activeCount = (totalChars * progress).floor().clamp(0, totalChars);
+
+      final completed = chars.take(activeCount).toString();
+      final upcoming = chars.skip(activeCount).toString();
+
+      return RichText(
+        textAlign: lineStyle.textAlign,
+        text: TextSpan(
+          children: [
+            TextSpan(text: completed, style: highlightedStyle),
+            TextSpan(text: upcoming, style: unhighlightedStyle),
+          ],
+        ),
+      );
+    }
+
+    // 2. Continuous sub-pixel character sweep (liquid karaoke)
+    return Stack(
+      alignment: _alignmentFor(lineStyle.textAlign),
+      children: [
+        Text(
+          line.text,
+          style: unhighlightedStyle,
+          textAlign: lineStyle.textAlign,
+        ),
+        ClipRect(
+          clipper: _HorizontalProgressClipper(progress),
+          child: Text(
+            line.text,
+            style: highlightedStyle,
+            textAlign: lineStyle.textAlign,
+          ),
+        ),
+      ],
     );
   }
 
@@ -218,7 +283,26 @@ class _SingleSyllableWidget extends StatelessWidget {
       return Text(syllable.text, style: highlightedStyle);
     }
 
-    // Actively wiping: dual-layer clip
+    // Stepped character reveal inside syllable
+    if (highlightStyle.flowMode == LyricFlowMode.characterStepped) {
+      final chars = syllable.text.characters;
+      final totalChars = chars.length;
+      final activeCount = (totalChars * progress).floor().clamp(0, totalChars);
+
+      final completed = chars.take(activeCount).toString();
+      final upcoming = chars.skip(activeCount).toString();
+
+      return RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(text: completed, style: highlightedStyle),
+            TextSpan(text: upcoming, style: unhighlightedStyle),
+          ],
+        ),
+      );
+    }
+
+    // Continuous sub-pixel wipe: dual-layer clip
     return Stack(
       children: [
         Text(syllable.text, style: unhighlightedStyle),

@@ -1,4 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+/// Defines how active lyric progress illuminates text across lines and syllables.
+enum LyricFlowMode {
+  /// Progress illuminates word-by-word or syllable-by-syllable using explicit timestamp tokens.
+  word,
+
+  /// Progress sweeps continuously across the line or syllable with sub-pixel liquid gradient precision.
+  characterSmooth,
+
+  /// Progress illuminates stepped character-by-character (classic arcade / KTV karaoke machine style).
+  characterStepped,
+}
 
 /// Styling attributes for an individual lyric line (active vs inactive states).
 @immutable
@@ -61,7 +73,7 @@ class LyricLineStyle {
   }
 }
 
-/// Highlight shader and wipe properties for syllable-level karaoke rendering.
+/// Highlight shader and wipe properties for syllable and character-level karaoke rendering.
 @immutable
 class KaraokeHighlightStyle {
   /// The color of the sung / completed syllable text.
@@ -82,13 +94,17 @@ class KaraokeHighlightStyle {
   /// Spread blur radius for the glow shadow.
   final double glowRadius;
 
+  /// Defines whether progression flows by word, continuous character wipe, or stepped character.
+  final LyricFlowMode flowMode;
+
   const KaraokeHighlightStyle({
-    this.activeColor = Colors.white,
+    this.activeColor = const Color(0xFFFFFFFF),
     this.inactiveColor = const Color(0x66FFFFFF),
     this.activeGradient,
     this.enableGlow = false,
     this.glowColor = const Color(0x80FFFFFF),
     this.glowRadius = 8.0,
+    this.flowMode = LyricFlowMode.word,
   });
 
   KaraokeHighlightStyle copyWith({
@@ -98,6 +114,7 @@ class KaraokeHighlightStyle {
     bool? enableGlow,
     Color? glowColor,
     double? glowRadius,
+    LyricFlowMode? flowMode,
   }) {
     return KaraokeHighlightStyle(
       activeColor: activeColor ?? this.activeColor,
@@ -106,6 +123,7 @@ class KaraokeHighlightStyle {
       enableGlow: enableGlow ?? this.enableGlow,
       glowColor: glowColor ?? this.glowColor,
       glowRadius: glowRadius ?? this.glowRadius,
+      flowMode: flowMode ?? this.flowMode,
     );
   }
 }
@@ -162,7 +180,7 @@ class LyricsTheme {
   /// Appearance of upcoming and previously sung lines.
   final LyricLineStyle inactiveLineStyle;
 
-  /// Fine-grained karaoke syllable highlight settings.
+  /// Fine-grained karaoke syllable and character highlight settings.
   final KaraokeHighlightStyle karaokeStyle;
 
   /// Visualizer and countdown styling during instrumental breaks.

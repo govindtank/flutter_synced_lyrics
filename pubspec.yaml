@@ -1,6 +1,6 @@
 name: flutter_synced_lyrics
 description: High-performance 120 FPS synchronized lyrics and karaoke engine for Flutter. Supports syllable-level LRC, TTML, Spotify/Apple Music styles, and ambient backdrops.
-version: 1.0.0
+version: 1.0.1
 homepage: https://govindtank.github.io/flutter_synced_lyrics/
 repository: https://github.com/govindtank/flutter_synced_lyrics
 issue_tracker: https://github.com/govindtank/flutter_synced_lyrics/issues

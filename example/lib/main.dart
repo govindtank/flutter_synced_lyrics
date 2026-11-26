@@ -30,6 +30,7 @@ class SyncedLyricsShowcaseApp extends StatelessWidget {
 
 enum DemoTrack {
   popSyllable,
+  hindiKesariya,
   rockInstrumental,
   multilingualAnime,
   cyberpunkTtml,
@@ -39,6 +40,7 @@ enum DemoTrack {
 enum ThemeStyle {
   appleMusic,
   spotify,
+  bollywoodRoyal,
   musixmatch,
   cyberpunk,
   minimalist,
@@ -56,6 +58,7 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
   late LyricsController _lyricsController;
   DemoTrack _selectedTrack = DemoTrack.popSyllable;
   ThemeStyle _selectedTheme = ThemeStyle.appleMusic;
+  LyricFlowMode _flowMode = LyricFlowMode.characterSmooth;
 
   bool _isPlaying = true;
   double _playbackSpeed = 1.0;
@@ -85,6 +88,37 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
 [00:24.20]<00:24.20>You <00:24.80>don't <00:25.40>even <00:26.20>have <00:26.90>to <00:27.50>do <00:28.10>too <00:28.80>much <00:29.80>
 [00:30.80]<00:30.80>You <00:31.40>can <00:32.00>turn <00:32.60>me <00:33.20>on <00:33.90>with <00:34.50>just <00:35.20>a <00:35.90>touch <00:37.00>
 [00:38.00]<00:38.00>I <00:38.60>said, <00:39.30>ooh, <00:40.20>I'm <00:41.00>blinded <00:42.00>by <00:42.80>the <00:43.60>lights <00:45.00>
+''';
+
+  static const String _hindiKesariyaLrc = '''
+[ti:Kesariya (केसरिया)]
+[ar:Arijit Singh, Pritam]
+[al:Brahmāstra]
+[length:00:48.00]
+[00:02.00]मुझको इतना बताए कोई
+[00:02.00]Mujhko itna bataye koi
+[00:02.00]Someone please tell me this
+[00:07.50]कैसे तुझसे दिल ना लगाए कोई
+[00:07.50]Kaise tujhse dil na lagaye koi
+[00:07.50]How could anyone not fall for you?
+[00:13.50]रब्बा ने तुझको बनाने में
+[00:13.50]Rabba ne tujhko banane mein
+[00:13.50]God, while crafting your beauty
+[00:19.00]कर दी है हुस्न की खाली तिजोरियां
+[00:19.00]Kar di hai husn ki khaali tijoriyan
+[00:19.00]Has emptied out all the treasuries of grace
+[00:25.00]काजल की सियाही से लिखी
+[00:25.00]Kaajal ki siyahi se likhi
+[00:25.00]Penned with the dark ink of kohl
+[00:30.50]है तूने जाने कितनों की लव स्टोरियां
+[00:30.50]Hai tune jaane kitno ki love storiyan
+[00:30.50]You have scripted so many love stories
+[00:36.00]केसरिया तेरा इश्क़ है पिया
+[00:36.00]Kesariya tera ishq hai piya
+[00:36.00]Saffron is the color of your love, my beloved
+[00:41.50]रंग जाऊं जो मैं हाथ लगाऊं
+[00:41.50]Rang jaaun jo main haath lagaaun
+[00:41.50]I get stained in your shades whenever I touch it
 ''';
 
   static const String _bohemianRhapsodyLrc = '''
@@ -209,6 +243,12 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
           _lyricsController.setDocument(LyricsParser.parse(_blindingLightsLrc));
           _trackDuration = const Duration(seconds: 45);
           break;
+        case DemoTrack.hindiKesariya:
+          _lyricsController.setDocument(LyricsParser.parse(_hindiKesariyaLrc));
+          _trackDuration = const Duration(seconds: 48);
+          _selectedTheme = ThemeStyle.bollywoodRoyal;
+          _flowMode = LyricFlowMode.characterSmooth;
+          break;
         case DemoTrack.rockInstrumental:
           _lyricsController
               .setDocument(LyricsParser.parse(_bohemianRhapsodyLrc));
@@ -243,22 +283,32 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
           baseFontSize: _fontSize,
           activeScale: _activeScale,
           blurInactive: _blurInactive,
+          flowMode: _flowMode,
         );
       case ThemeStyle.spotify:
         return LyricsPreset.spotify(
           baseFontSize: _fontSize,
+          flowMode: _flowMode,
+        );
+      case ThemeStyle.bollywoodRoyal:
+        return LyricsPreset.bollywoodRoyal(
+          baseFontSize: _fontSize,
+          flowMode: _flowMode,
         );
       case ThemeStyle.musixmatch:
         return LyricsPreset.musixmatch(
           baseFontSize: _fontSize,
+          flowMode: _flowMode,
         );
       case ThemeStyle.cyberpunk:
         return LyricsPreset.cyberpunk(
           baseFontSize: _fontSize,
+          flowMode: _flowMode,
         );
       case ThemeStyle.minimalist:
         return LyricsPreset.minimalistVinyl(
           baseFontSize: _fontSize,
+          flowMode: _flowMode,
         );
     }
   }
@@ -276,6 +326,12 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
           const Color(0xFF065F46),
           const Color(0xFF064E3B),
           const Color(0xFF0A0A0F),
+        ];
+      case ThemeStyle.bollywoodRoyal:
+        return [
+          const Color(0xFF9A3412),
+          const Color(0xFF78350F),
+          const Color(0xFF1E1B4B),
         ];
       case ThemeStyle.musixmatch:
         return [
@@ -333,6 +389,7 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
                 child: LyricsView(
                   controller: _lyricsController,
                   theme: theme,
+                  flowMode: _flowMode,
                   showTranslation: _showTranslation,
                   showRomanization: _showRomanization,
                   onLineTap: (line, timestamp) {
@@ -423,7 +480,7 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
                   ),
                 ),
                 Text(
-                  '120 FPS Synced Karaoke • ${_formatDuration(_currentPosition)} / ${_formatDuration(_trackDuration)}',
+                  '${_flowMode.name.toUpperCase()} FLOW • ${_formatDuration(_currentPosition)} / ${_formatDuration(_trackDuration)}',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 11,
@@ -432,7 +489,12 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
+          IconButton(
+            tooltip: 'Inspect TTML XML',
+            icon: const Icon(Icons.code_rounded, color: Color(0xFF00E676)),
+            onPressed: _openTtmlInspectorModal,
+          ),
           IconButton(
             tooltip: 'Track Selector',
             icon: const Icon(Icons.queue_music_rounded, color: Colors.white),
@@ -459,7 +521,6 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
             .clamp(0.0, 1.0)
         : 0.0;
 
-    // Synthetic waveform data for waveform_pro visualization
     final samples = List.generate(
       48,
       (i) => (0.15 + 0.85 * ((i * 7 + 13) % 19) / 19.0),
@@ -663,6 +724,12 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
                 Icons.lyrics_rounded,
               ),
               _buildTrackTile(
+                DemoTrack.hindiKesariya,
+                'Kesariya (केसरिया) — Brahmāstra',
+                'Hindi Devanagari • Character-wise & word flow with Hinglish translation',
+                Icons.auto_stories_rounded,
+              ),
+              _buildTrackTile(
                 DemoTrack.rockInstrumental,
                 'Bohemian Rhapsody (Queen)',
                 'Standard LRC • Instrumental break & guitar solo countdown',
@@ -764,6 +831,11 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
                 'High-contrast bold white text, dimmed inactive lines',
               ),
               _buildThemeTile(
+                ThemeStyle.bollywoodRoyal,
+                'Bollywood Royal (Hindi / Devanagari)',
+                'Amber gold & saffron glow, elegant Devanagari typography',
+              ),
+              _buildThemeTile(
                 ThemeStyle.musixmatch,
                 'Musixmatch (Neon Energy)',
                 'High-energy neon yellow/green fill, word bounce & glow',
@@ -833,12 +905,46 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Customize Typography & Dynamics',
+                    'Customize Typography & Flow Mode',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Flow Animation Mode:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SegmentedButton<LyricFlowMode>(
+                    segments: const [
+                      ButtonSegment(
+                        value: LyricFlowMode.word,
+                        label: Text('Word'),
+                        icon: Icon(Icons.short_text_rounded),
+                      ),
+                      ButtonSegment(
+                        value: LyricFlowMode.characterSmooth,
+                        label: Text('Char Smooth'),
+                        icon: Icon(Icons.water_drop_rounded),
+                      ),
+                      ButtonSegment(
+                        value: LyricFlowMode.characterStepped,
+                        label: Text('Char Step'),
+                        icon: Icon(Icons.sports_esports_rounded),
+                      ),
+                    ],
+                    selected: {_flowMode},
+                    onSelectionChanged: (set) {
+                      setState(() => _flowMode = set.first);
+                      setModalState(() {});
+                    },
                   ),
                   const SizedBox(height: 14),
                   Row(
@@ -921,18 +1027,18 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
-                    children: [
+                    children: const [
                       Chip(
-                        avatar: const Icon(Icons.blur_on, size: 16),
-                        label: const Text('ambient_backdrop_glow'),
+                        avatar: Icon(Icons.blur_on, size: 16),
+                        label: Text('ambient_backdrop_glow'),
                       ),
                       Chip(
-                        avatar: const Icon(Icons.graphic_eq, size: 16),
-                        label: const Text('waveform_pro'),
+                        avatar: Icon(Icons.graphic_eq, size: 16),
+                        label: Text('waveform_pro'),
                       ),
                       Chip(
-                        avatar: const Icon(Icons.view_carousel, size: 16),
-                        label: const Text('flutter_smooth_marquee'),
+                        avatar: Icon(Icons.view_carousel, size: 16),
+                        label: Text('flutter_smooth_marquee'),
                       ),
                     ],
                   ),
@@ -940,6 +1046,94 @@ class _LyricsStudioScreenState extends State<LyricsStudioScreen>
               ),
             );
           },
+        );
+      },
+    );
+  }
+
+  void _openTtmlInspectorModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF161722),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '📜 Live TTML XML Structure',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  IconButton(
+                    icon:
+                        const Icon(Icons.close_rounded, color: Colors.white70),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Full W3C & Apple Music Timed Text Markup Language (TTML) parsed natively with zero dependencies:',
+                style: TextStyle(color: Colors.white60, fontSize: 12),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                height: 260,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.black45,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: const SingleChildScrollView(
+                  child: SelectableText(
+                    _cyberpunkTtml,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: Color(0xFF00E676),
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00E676),
+                  foregroundColor: Colors.black,
+                  minimumSize: const Size.fromHeight(44),
+                ),
+                icon: const Icon(Icons.play_circle_fill_rounded),
+                label: const Text(
+                  'Play This TTML Song Now',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  _loadTrack(DemoTrack.cyberpunkTtml);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
         );
       },
     );

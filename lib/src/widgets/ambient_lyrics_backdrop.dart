@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Dynamic ambient blurred canvas that renders reactive lighting and album art glows
 /// behind lyrics (inspired by Apple Music and Spotify Canvas).
@@ -110,7 +110,7 @@ class _AmbientLyricsBackdropState extends State<AmbientLyricsBackdrop>
               sigmaY: widget.blurSigma,
             ),
             child: Container(
-              color: Colors.black.withValues(alpha: widget.darkness),
+              color: const Color(0xFF000000).withValues(alpha: widget.darkness),
             ),
           ),
         ),

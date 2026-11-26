@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../controllers/lyrics_controller.dart';
 import '../theme/lyrics_theme.dart';
 import 'syllable_line_view.dart';
@@ -23,10 +23,10 @@ class MiniLyricsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeTheme = theme ??
-        LyricsTheme(
-          activeLineStyle: const LyricLineStyle(
+        const LyricsTheme(
+          activeLineStyle: LyricLineStyle(
             textStyle: TextStyle(
-              color: Colors.white,
+              color: Color(0xFFFFFFFF),
               fontSize: 15,
               fontWeight: FontWeight.w700,
             ),
@@ -38,7 +38,7 @@ class MiniLyricsBar extends StatelessWidget {
             textAlign: TextAlign.left,
             padding: EdgeInsets.zero,
           ),
-          inactiveLineStyle: const LyricLineStyle(
+          inactiveLineStyle: LyricLineStyle(
             textStyle: TextStyle(
               color: Color(0x80FFFFFF),
               fontSize: 15,
@@ -93,25 +93,28 @@ class MiniLyricsBar extends StatelessWidget {
           );
         }
 
-        return InkWell(
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: const Color(0xFFFFFFFF).withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.12),
+                color: const Color(0xFFFFFFFF).withValues(alpha: 0.12),
                 width: 1,
               ),
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.lyrics_rounded,
-                  color: Colors.white70,
-                  size: 20,
+                const Text(
+                  '♪',
+                  style: TextStyle(
+                    color: Color(0xB3FFFFFF),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(child: content),

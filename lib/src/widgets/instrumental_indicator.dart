@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../theme/lyrics_theme.dart';
 
 /// Animated visualizer dots and remaining time countdown shown during guitar solos and verse breaks.

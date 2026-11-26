@@ -1,3 +1,12 @@
+## 1.0.1
+
+* Added `LyricFlowMode`: choose between continuous liquid character sweep (`characterSmooth`), stepped arcade KTV reveal (`characterStepped`), or word/syllable timing (`word`).
+* Added **Bollywood Royal** preset with Devanagari Hindi typography, rich saffron & amber gold glow, and character-wise flowing.
+* Completely decoupled core library from `package:flutter/material.dart` across all components and widgets (pure `widgets.dart` architecture).
+* Fixed Pana static analysis deprecation issue for guaranteed 160/160 pub.dev score.
+* Added animated working solution showcase GIF (`doc/assets/showcase.gif`).
+* Added comprehensive TTML (Timed Text XML) integration guide and raw XML inspector.
+
 ## 1.0.0
 
 * Initial stable release of `flutter_synced_lyrics` — 120 FPS synchronized lyrics & karaoke engine for Flutter.
